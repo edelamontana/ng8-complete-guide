@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+
 import { Recipe } from '../recipes/recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
-import { ShoppinglistService } from '../shopping-list/shopping-list.service';
+import { ShoppingListService } from '../shopping-list/shopping-list.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RecipesService {
+
+  recipesChanged = new Subject<Recipe[]>();
 
     private recipes: Recipe[] = [
         new Recipe('Tasty Schnitzel', 'A super-tasty Schnitzel',
@@ -17,20 +21,33 @@ export class RecipesService {
             [new Ingredient('Buns', 2), new Ingredient('Meat', 1)])
     ];
 
-    constructor(private slService: ShoppinglistService) { }
+    constructor(private slService: ShoppingListService) { }
 
     getRecipes() {
         // Con slice devuelve una copia del array de Recipes, de tal forma que impide acceder desde fuera a el
-        return this.recipes.slice();
-    }
+    return this.recipes.slice();
+  }
 
-    getRecipe(index: number) {
-        return this.recipes[index];
-    }
+  getRecipe(index: number) {
+    return this.recipes[index];
+  }
 
-    addIngredientsToShoppingList(ingredients: Ingredient[]) {
-        this.slService.addIngredients(ingredients);
-    }
+  addIngredientsToShoppingList(ingredients: Ingredient[]) {
+    this.slService.addIngredients(ingredients);
+  }
 
+  addRecipe(recipe: Recipe) {
+    this.recipes.push(recipe);
+    this.recipesChanged.next(this.recipes.slice());
+  }
 
+  updateRecipe(index: number, newRecipe: Recipe) {
+    this.recipes[index] = newRecipe;
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  deleteRecipe(index: number) {
+    this.recipes.splice(index, 1);
+    this.recipesChanged.next(this.recipes.slice());
+  }
 }

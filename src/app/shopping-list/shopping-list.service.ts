@@ -1,9 +1,10 @@
 import { Subject } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model';
 
-export class ShoppinglistService {
+export class ShoppingListService {
 
-    ingredientsChanged = new Subject<Ingredient[]>();
+	ingredientsChanged = new Subject<Ingredient[]>();
+	startedEditing = new Subject<number>();
 
     private ingredients: Ingredient[] = [
         new Ingredient('Apples', 5),
@@ -14,7 +15,11 @@ export class ShoppinglistService {
 
     getIngredients() {
         return this.ingredients.slice();
-    }
+	}
+	
+	getIngredient(index: number) {
+		return this.ingredients[index];
+	}
 
     addIngredient(ingredient: Ingredient) {
         this.ingredients.push(ingredient);
@@ -26,5 +31,16 @@ export class ShoppinglistService {
         // Si anteponemos el operador spread (...) podemos hacer que trate el contenido del array, añadiendo independientemente los elementos
         this.ingredients.push(...ingredients);
         this.ingredientsChanged.next(this.ingredients.slice());
-    }
+	}
+	
+	updateIngredient(index: number, newIngredient: Ingredient) {
+		this.ingredients[index] = newIngredient;
+		this.ingredientsChanged.next(this.ingredients.slice());
+	}
+
+	deleteIngredient(index: number) {
+		console.log(index);
+		this.ingredients.splice(index, 1);
+		this.ingredientsChanged.next(this.ingredients.slice());
+	}
 }
